@@ -104,3 +104,6 @@ env/
 # PyCharm
 .idea/
 
+# database file
+*.db
+*.sqlite

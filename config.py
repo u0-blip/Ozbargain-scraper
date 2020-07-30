@@ -1,5 +1,5 @@
 # Create dummy secrey key so we can use sessions
-SECRET_KEY = '123456790'
+SECRET_KEY = '7d44d441f2756sdera7d441f2b6176a'
 
 # Create in-memory database
 DATABASE_FILE = 'sample_db.sqlite'
@@ -24,3 +24,7 @@ SECURITY_POST_REGISTER_VIEW = "/admin/"
 SECURITY_REGISTERABLE = True
 SECURITY_SEND_REGISTER_EMAIL = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# Celery configs
+CELERY_BROKER_URL = 'redis://localhost:6379/2'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'

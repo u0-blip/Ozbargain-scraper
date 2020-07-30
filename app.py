@@ -1,6 +1,7 @@
 #!venv/bin/python
+import redis
 import os
-from flask import Flask, url_for, redirect, render_template, request, abort
+from flask import Flask, url_for, redirect, render_template, request, abort, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required, current_user
@@ -8,19 +9,21 @@ from flask_security.utils import encrypt_password
 import flask_admin
 from flask_admin.contrib import sqla
 from flask_admin import helpers as admin_helpers
-from flask_admin import BaseView, expose
+from flask_admin import BaseView, expose, AdminIndexView
 
-from pandas_datareader import data
+from wtforms import form, StringField
+
+from celery_worker import get_spider_output
+
 import datetime
-from bokeh.plotting import figure, show, output_file
-from bokeh.embed import components
-from bokeh.resources import CDN
+# from bokeh.plotting import figure, show, output_file
+# from bokeh.embed import components
+# from bokeh.resources import CDN
 from flask import Blueprint
 import numpy as np
 
-# Create Flask application
-app = Flask(__name__)
-app.config.from_pyfile('config.py')
+from basic_app import app
+
 db = SQLAlchemy(app)
 
 
@@ -112,55 +115,51 @@ class CustomView(BaseView):
 def index():
     return render_template('index.html')
 
-@app.route('/plot',methods =['GET','POST'])
-def plot():
-    start = datetime.datetime(2020,5,1)
-    end = datetime.datetime.today().strftime("%Y/%m/%d")
-    # word = request.form['company_ip']
 
-    # df=data.DataReader(name=word,data_source="iex",start=start,end=end, api_key='pk_c88b455c96e54a6b965aa23c1797f5ad')
-    import pandas_datareader as pdr
-    df=pdr.get_data_yahoo('AAPL', start=start, end=end, interval='d')
 
-    def inc_dec(c, o):
-        if c > o:
-            value="Increase"
-        elif c < o:
-            value="Decrease"
+class query_data(db.Model):
+    __tablename__ = 'query_data'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+    user = db.Column(db.ForeignKey('user.id'))
+
+    def __str__(self):
+        return self.name
+
+class query_form(form.Form):
+    query = StringField(label='Query')
+
+class query_view(AdminIndexView):
+    # form = None
+    @expose('/', methods=['POST', 'GET'])
+    def index(self):
+        form = query_form(request.form)
+
+        if current_user.is_authenticated:
+            if form.validate() and request.method == 'POST':
+                # print('user is ', current_user.id)
+                query = query_data(description = form.query._value(), user = current_user.id)
+                get_spider_output.apply_async(kwargs={'user_id': current_user.id})
+
+                db.session.add(query)
+                db.session.commit()
+
+            queries = db.session.query(query_data).filter(query_data.user == current_user.id).all()
         else:
-            value="Equal"
-        return value
+            # login
+            return redirect(url_for('security.login', next=request.url))
 
-    # print('head', df.head())
-    # print(len(df))
-
-    df["Status"]=[inc_dec(c,o) for c, o in zip(df.Close,df.Open)]
-    df["Middle"]=(df.Open+df.Close)/2
-    df["Height"]=abs(df.Close-df.Open)
-
-    p=figure(x_axis_type='datetime', width=1000, height=300)
-    p.title.text="Candlestick Chart"
-    p.grid.grid_line_alpha=0.3
-
-    hours_12=12*60*60*1000
-
-    p.segment(df.index, df.High, df.index, df.Low, color="Black")
-
-    p.rect(df.index[df.Status=="Increase"],df.Middle[df.Status=="Increase"],
-           hours_12, df.Height[df.Status=="Increase"],fill_color="#CCFFFF",line_color="black")
-
-    p.rect(df.index[df.Status=="Decrease"],df.Middle[df.Status=="Decrease"],
-           hours_12, df.Height[df.Status=="Decrease"],fill_color="#FF3333",line_color="black")
+        # if self.form == None:
+        #     self.form = query_form()
+        return self.render('admin/index.html', query_form = form, queries = queries)
 
 
-    script1, div1 = components(p)
-    cdn_js=CDN.js_files[0]
-    # cdn_css=CDN.css_files[0]
-    predicted = predict_prices(df.Middle[-10:].values.reshape(-1, 1), np.expand_dims(np.arange(29), 1))
-    # print(predicted)
-    # print(predicted, script1, div1, cdn_js)
-    return script1 + div1
+# admin.add_view(query_view(query_data, db.session, menu_icon_type='fa', menu_icon_value='fa-users', name="query"))
 
+# @app.route('/plot',methods =['GET','POST'])
+# def plot():
+#     return None
 
 def predict_prices(prices,x):
     from sklearn.svm import SVR
@@ -173,6 +172,16 @@ def predict_prices(prices,x):
 
     return svr_rbf.predict(x)[0]
 
+@app.route('/get_posts', methods=['POST'])
+# @login_required
+def get_posts():
+    rdb = redis.Redis(port=6379, db=0)
+    items = rdb.get('items')
+    if items != None:
+        return items
+    else:
+        return 'None'
+
 
 # Create admin
 admin = flask_admin.Admin(
@@ -180,6 +189,7 @@ admin = flask_admin.Admin(
     'My Dashboard',
     base_template='my_master.html',
     template_mode='bootstrap3',
+    index_view=query_view(menu_icon_type='fa', menu_icon_value='fa-server',name="Home", endpoint='admin')
 )
 
 # Add model views

@@ -5,18 +5,18 @@
  *      This is a demo file used only for the main dashboard (index.html)
  **/
 
-$(function () {
-      $.ajax({
-          type: 'POST',
-          url: '/plot',
-          success: function (script) {
-              $('#revenue-chart').html(script)
-          },
-          error: function () {
-              alert('Unexpected error');
-          }
-      });
-  });
+// $(function () {
+//       $.ajax({
+//           type: 'POST',
+//           url: '/plot',
+//           success: function (script) {
+//               $('#revenue-chart').html(script)
+//           },
+//           error: function () {
+//               alert('Unexpected error');
+//           }
+//       });
+//   });
 
 $(function () {
 

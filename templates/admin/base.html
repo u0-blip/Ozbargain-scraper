@@ -14,8 +14,12 @@
   {% endblock head_meta %}
 
   {% block head_css %}
+  <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
   <!-- Bootstrap 3.3.6 -->
-  <link href="{{url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet"></link>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.1/css/bootstrap.min.css" integrity="sha384-VCmXjywReHh4PwowAiWNagnWcLhlEJLA5buUprzK8rxFgeH0kww/aWY76TfkUoSX" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.1/js/bootstrap.min.js" integrity="sha384-XEerZL0cuoUbHE4nZReLT7nx9gQrQreJekYhJD9WNWhH8nEW+0c5qq7aIo2Wl30J" crossorigin="anonymous"></script>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Ionicons -->
@@ -391,12 +395,9 @@
   <div class="control-sidebar-bg"></div>
 
   <footer class="main-footer">
-     <strong>Copyright &copy; 2018 <a href="https://github.com/jonalxh">Jonathan Arias</a></strong> -
-    <strong>Admin LTE Template <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights reserved.
-    <div class="pull-right hidden-xs">
-      <b>Version</b> 0.2
-    </div>
+     <strong>Copyright &copy; 2020 <a href="https://github.com/u0-blip">Peter Chen</a></strong>
   </footer>
+
   {% endif %}
 
 </div>
@@ -416,7 +417,6 @@
   $.widget.bridge('uibutton', $.ui.button);
 </script>
 <!-- Bootstrap 3.3.6 -->
-<script src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
 <script src="{{ admin_static.url(filename='vendor/select2/select2.min.js', v='3.5.2') }}" type="text/javascript"></script>
 
 {% if admin_view.extra_js %}
@@ -457,8 +457,6 @@
 
 
   <!-- <script src="{{url_for('static',filename='js/pages/dashboard.js')}}"></script> -->
-  <script src="{{url_for('static',filename='js/pages/stonks.js')}}"></script>
-
 
 {% endif %}
 

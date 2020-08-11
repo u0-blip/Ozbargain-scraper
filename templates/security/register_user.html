@@ -19,10 +19,12 @@
                 {% endif %}
                 {{ render_field(register_user_form.submit, class="btn btn-primary") }}
             </form>
+            <p> The registration will be approved by the site owner before you will be given a account. </p>
             <p>Already signed up? Please <a href="{{ url_for('security.login') }}">log in</a>.</p>
         </div>
     </div>
 </div>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br>
 {% endblock body %}

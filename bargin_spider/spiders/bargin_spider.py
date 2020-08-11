@@ -19,7 +19,6 @@ class bargin_spider(scrapy.Spider):
             }
 
         page_num = response.css("a.pager-next::attr(title)").extract_first()
-        print(page_num)
         if '5' in page_num:
             return
 

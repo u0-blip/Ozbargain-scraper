@@ -17,16 +17,31 @@
   </ol>
 </section>
 
+<link href="{{url_for('static',filename='css/main.css')}}" rel="stylesheet">
+</link>
+<script>
+  function deleteRow(btn) {
+    var row = btn.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+  }
+
+  $(function () {
+    $("#sortable").sortable({
+      // items : '.handle',
+      handle: ".handle",
+      cancel: ''
+    });
+    $("#sortable").disableSelection();
+  });
+
+</script>
 
 <section class="content">
   <!-- Small boxes (Stat box) -->
 
 
-  <!-- /.row -->
-  <!-- Main row -->
   <div class="row">
-    <!-- Left col -->
-    <section class="col-lg-6 connectedSortable">
+    <section class="col-lg-4 col-sm-12 connectedSortable">
 
       <div class="box box-primary">
         <div class="box-header">
@@ -36,29 +51,83 @@
 
         </div>
         <!-- /.box-header -->
-        <form action="{{ url_for('admin.index') }}" method="POST", name ="query_form">
+
+
+        <form action="{{ url_for('admin.index') }}" method="POST" , name="query_form">
           <div class="box-body">
-            {% if queries|length > 0 %}
-            {% for q in queries %}
-              <div id='query'> {{q.description}} </div>
-            {% endfor %}
-            {% endif %}
             <div class="form-group">
-              {{ query_form.query(class="form-control", placeholder="Query") }}
+              <div class="container">
+                <div class="row">
+                  <div class="col-12" id="sortable">
+                    {% for field in query_list_form.queries %}
+                    <div class="row" style="margin-bottom: 10px;">
+
+                      {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
+                      <div class="col-10">{{ field.query(class="form-control ", placeholder="Query") }}</div>
+                      <div class="col-1">
+                        <button type="button" class="btn btn-default handle justify-content-right"
+                          aria-label="Left Align">
+                          <ion-icon name="reorder-three"></ion-icon>
+                        </button>
+                      </div>
+                      <div class="col-1">
+                        <button type="button" class="btn btn-default justify-content-right" aria-label="Close"
+                          onclick="deleteRow(this)">
+                          <span aria-hidden="true">&times;</span>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-12">
+                    {{ query_list_form.query1(class="form-control ", placeholder="Query") }}
+                  </div>
+                </div>
+              </div>
+
               <!-- <input type="text" class="form-control" name="subject" placeholder="Query"> -->
             </div>
           </div>
 
           <div class="box-footer clearfix">
-            <button type="submit button" class="pull-right btn btn-default" id="sendEmail">Add
-              <i class="fa fa-arrow-circle-right"></i></button>
+            {{ query_list_form.submit_query(class="pull-right btn btn-default") }}
+            <!-- <i class="fa fa-arrow-circle-right"></i></button> -->
+          </div>
+        </form>
+
+
+      </div>
+
+    </section>
+    <section class='col-lg-4 col-sm-12 connectedSortable'>
+      <div class="box box-primary">
+        <div class="box-header">
+          <i class="fa fa-envelope"></i>
+
+          <h3 class="box-title">Communication preference</h3>
+        </div>
+        <form action="{{ url_for('admin.index') }}" method="POST" , name='preference_form'>
+          <div class="box-body">
+            <div class="container">
+              {% for p in pref_list_form.pref %}
+              <div class="row">
+              {% for d in p %}
+                {% if loop.index == 1 %}  <div class="col-11">{{d._value()}}:</div>
+                {% else %} <div class="col-1">{{d}}</div>
+                {% endif %}
+              {% endfor %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="box-footer clearfix">
+            {{ pref_list_form.submit_pref(class="pull-right btn btn-default") }}
+            <!-- <i class="fa fa-arrow-circle-right"></i></button> -->
           </div>
         </form>
       </div>
     </section>
-    <!-- /.Left col -->
-    <!-- right col (We are only adding the ID to make the widgets sortable)-->
-    <section class="col-lg-6 connectedSortable">
+    <section class="col-lg-4 col-sm-12 connectedSortable">
 
       <div class="box box-solid bg-teal-gradient">
         <div class="box-header">
@@ -77,9 +146,7 @@
       </div>
 
     </section>
-    <!-- right col -->
   </div>
-  <!-- /.row (main row) -->
 
 </section>
 <!-- /.content -->
@@ -123,4 +190,5 @@
 {% endblock body %}
 
 {% block tail %}
+<script src="{{url_for('static',filename='js/pages/stonks.js')}}"></script>
 {% endblock tail %}

@@ -28,7 +28,7 @@ class index_view(AdminIndexView):
     @expose('/', methods=['POST', 'GET'])
     def index(self):
         if current_user.is_authenticated:
-            user = db.session.query(User).filter(User.id == current_user.id).first()
+            
             query_list_form = Query_list_form(formdata=request.form)
             print('req form', request.form)
             pref_list_form = Pref_list_form(formdata=request.form)

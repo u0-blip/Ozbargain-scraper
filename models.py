@@ -8,7 +8,7 @@ from flask_security.utils import encrypt_password
 
 db = SQLAlchemy(app)
 
-pref_descriptions = ['frequency', 'deal value', 'stock']
+pref_descriptions = ['Allow contact through Email on deals']
 
 # Define models
 roles_users = db.Table(

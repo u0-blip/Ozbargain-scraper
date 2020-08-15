@@ -10,6 +10,8 @@ celery = celery.Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
 import os
+mail = Mail()
+mail.init_app(app)
 
 @celery.task(bind=True)
 def get_spider_output(self, user_id):
@@ -30,3 +32,15 @@ def get_spider_output(self, user_id):
     print('process is done')
     return 
 
+
+
+@celery.task(bind=True)
+def contact():
+    msg = Message(form.subject.data, sender='contact@example.com', recipients=['your_email@example.com'])
+    msg.body = """
+    From: %s <%s>
+    %s
+    """ % (form.name.data, form.email.data, form.message.data)
+    mail.send(msg)
+
+    return 'Form posted.'

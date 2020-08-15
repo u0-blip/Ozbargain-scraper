@@ -28,3 +28,10 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # Celery configs
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
+
+# Email setting
+MAIL_SERVER = "smtp.gmail.com"
+MAIL_PORT = 465
+MAIL_USE_SSL = True
+MAIL_USERNAME = 'contact@example.com'
+MAIL_PASSWORD = 'your-password'

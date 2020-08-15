@@ -8,6 +8,7 @@ from flask_admin.contrib import sqla
 from flask_admin import helpers as admin_helpers
 from flask_admin import BaseView, expose, AdminIndexView
 from wtforms import form, StringField, fields, FormField
+from flask_mail import Message, Mail
 
 import redis
 import os
@@ -20,7 +21,7 @@ import numpy as np
 # from bokeh.resources import CDN
 
 from basic_app import app
-from models import User, roles_users, Role, db, user_datastore,build_sample_db
+from models import User, roles_users, Role, db, user_datastore, build_sample_db
 from celery_worker import get_spider_output
 from utilities import get_posts, rdb
 from admin_views import admin
@@ -39,6 +40,11 @@ def security_context_processor():
         h=admin_helpers,
         get_url=url_for
     )
+
+
+
+
+ 
 
 
 if __name__ == '__main__':
